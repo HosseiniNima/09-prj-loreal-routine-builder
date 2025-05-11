@@ -9,7 +9,6 @@ const workerURL = "https://loral-worker.nima-hosseini.workers.dev/";
 const selectedProducts = [];
 
 function addProductToSelection(productId) {
-  // Load products and find the selected product
   loadProducts().then((products) => {
     const product = products.find((p) => p.id == productId);
 
@@ -20,16 +19,54 @@ function addProductToSelection(productId) {
       // Update the selected products list
       const selectedProductsList = document.getElementById("selectedProductsList");
       selectedProductsList.innerHTML += `
-        <div class="selected-product">
+        <div class="selected-product" data-id="${product.id}">
           <img src="${product.image}" alt="${product.name}">
           <div>
             <h4>${product.name}</h4>
             <p>${product.brand}</p>
           </div>
+          <button class="remove-product-btn">Remove</button>
         </div>
       `;
+
+      // Add event listener to the "Remove" button
+      const removeButton = selectedProductsList.querySelector(
+        `.selected-product[data-id="${product.id}"] .remove-product-btn`
+      );
+      removeButton.addEventListener("click", () => {
+        removeProductFromSelection(product.id);
+      });
+
+      // Hide the product from the product list
+      const productCard = document.querySelector(`.product-card[data-id="${product.id}"]`);
+      if (productCard) {
+        productCard.style.display = "none";
+      }
     }
   });
+}
+
+function removeProductFromSelection(productId) {
+  // Remove the product from the selectedProducts array
+  const productIndex = selectedProducts.findIndex((p) => p.id == productId);
+  if (productIndex !== -1) {
+    selectedProducts.splice(productIndex, 1);
+  }
+
+  // Remove the product from the UI
+  const selectedProductsList = document.getElementById("selectedProductsList");
+  const productElement = selectedProductsList.querySelector(
+    `.selected-product[data-id="${productId}"]`
+  );
+  if (productElement) {
+    productElement.remove();
+  }
+
+  // Show the product again in the product list
+  const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+  if (productCard) {
+    productCard.style.display = "flex";
+  }
 }
 
 /* Show initial placeholder until user selects a category */
@@ -51,7 +88,7 @@ function displayProducts(products) {
   productsContainer.innerHTML = products
     .map(
       (product) => `
-    <div class="product-card">
+    <div class="product-card" data-id="${product.id}">
       <img src="${product.image}" alt="${product.name}">
       <div class="product-info">
         <h3>${product.name}</h3>

@@ -327,3 +327,21 @@ body {
 .add-recommended-btn:hover {
   background: #0056b3;
 }
+
+/* Remove button for selected products */
+.remove-product-btn {
+  margin-left: auto;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: #ff003b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.remove-product-btn:hover {
+  background: #cc002f;
+}
