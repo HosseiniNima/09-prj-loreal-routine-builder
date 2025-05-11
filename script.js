@@ -4,6 +4,8 @@ const productsContainer = document.getElementById("productsContainer");
 const chatForm = document.getElementById("chatForm");
 const chatWindow = document.getElementById("chatWindow");
 
+const workerURL = "https://loral-worker.nima-hosseini.workers.dev/";
+
 /* Show initial placeholder until user selects a category */
 productsContainer.innerHTML = `
   <div class="placeholder-message">
@@ -49,9 +51,62 @@ categoryFilter.addEventListener("change", async (e) => {
   displayProducts(filteredProducts);
 });
 
-/* Chat form submission handler - placeholder for OpenAI integration */
-chatForm.addEventListener("submit", (e) => {
+/* Chat form submission handler */
+chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  chatWindow.innerHTML = "Connect to the OpenAI API for a response!";
+  // Get the user's input from the chat form
+  const userInput = e.target.elements["userInput"].value;
+
+  // Display the user's message in the chat window
+  chatWindow.innerHTML += `
+    <div class="chat-message user-message">
+      ${userInput}
+    </div>
+  `;
+
+  // Clear the input field
+  e.target.elements["userInput"].value = "";
+
+  // Show a loading message while waiting for the API response
+  chatWindow.innerHTML += `
+    <div class="chat-message bot-message">
+      Thinking...
+    </div>
+  `;
+
+  try {
+    // Make a POST request to the workerURL
+    const response = await fetch(workerURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o", // Specify the OpenAI model
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: userInput },
+        ],
+      }),
+    });
+
+    // Parse the JSON response
+    const data = await response.json();
+
+    // Display the assistant's response in the chat window
+    chatWindow.innerHTML += `
+      <div class="chat-message bot-message">
+        ${data.choices[0].message.content}
+      </div>
+    `;
+  } catch (error) {
+    // Handle errors (e.g., network issues or API errors)
+    chatWindow.innerHTML += `
+      <div class="chat-message bot-message">
+        Sorry, something went wrong. Please try again later.
+      </div>
+    `;
+    console.error("Error:", error);
+  }
 });
