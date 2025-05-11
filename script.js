@@ -93,7 +93,7 @@ chatForm.addEventListener("submit", async (e) => {
 
   const userInput = e.target.elements["userInput"].value;
 
-  // Display the user's message
+  // Display the user's message as a chat bubble
   chatWindow.innerHTML += `
     <div class="chat-message user-message">
       ${userInput}
@@ -105,11 +105,11 @@ chatForm.addEventListener("submit", async (e) => {
 
   e.target.elements["userInput"].value = "";
 
-  chatWindow.innerHTML += `
-    <div class="chat-message bot-message">
-      Thinking...
-    </div>
-  `;
+  // Display a "Thinking..." message from the bot
+  const thinkingMessage = document.createElement("div");
+  thinkingMessage.classList.add("chat-message", "bot-message");
+  thinkingMessage.textContent = "Thinking...";
+  chatWindow.appendChild(thinkingMessage);
 
   // Scroll to the bottom of the chat window
   chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -136,7 +136,10 @@ chatForm.addEventListener("submit", async (e) => {
 
     const data = await response.json();
 
-    // Display the assistant's response
+    // Remove the "Thinking..." message
+    thinkingMessage.remove();
+
+    // Display the assistant's response as a chat bubble
     chatWindow.innerHTML += `
       <div class="chat-message bot-message">
         ${data.choices[0].message.content}
@@ -146,6 +149,10 @@ chatForm.addEventListener("submit", async (e) => {
     // Scroll to the bottom of the chat window
     chatWindow.scrollTop = chatWindow.scrollHeight;
   } catch (error) {
+    // Remove the "Thinking..." message
+    thinkingMessage.remove();
+
+    // Display an error message as a chat bubble
     chatWindow.innerHTML += `
       <div class="chat-message bot-message">
         Sorry, something went wrong. Please try again later.
