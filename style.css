@@ -135,6 +135,12 @@ body {
   outline-offset: 2px;
 }
 
+/* Chat messages */
+.chat-message {
+  white-space: pre-wrap; /* Preserve line breaks and spacing */
+  margin-bottom: 10px;
+}
+
 /* visually hidden */
 .visually-hidden {
   position: absolute;

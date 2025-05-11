@@ -100,6 +100,9 @@ chatForm.addEventListener("submit", async (e) => {
     </div>
   `;
 
+  // Scroll to the bottom of the chat window
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
   e.target.elements["userInput"].value = "";
 
   chatWindow.innerHTML += `
@@ -107,6 +110,9 @@ chatForm.addEventListener("submit", async (e) => {
       Thinking...
     </div>
   `;
+
+  // Scroll to the bottom of the chat window
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
     const systemMessage = `
@@ -130,17 +136,25 @@ chatForm.addEventListener("submit", async (e) => {
 
     const data = await response.json();
 
+    // Display the assistant's response
     chatWindow.innerHTML += `
       <div class="chat-message bot-message">
         ${data.choices[0].message.content}
       </div>
     `;
+
+    // Scroll to the bottom of the chat window
+    chatWindow.scrollTop = chatWindow.scrollHeight;
   } catch (error) {
     chatWindow.innerHTML += `
       <div class="chat-message bot-message">
         Sorry, something went wrong. Please try again later.
       </div>
     `;
+
+    // Scroll to the bottom of the chat window
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
     console.error("Error:", error);
   }
 });
