@@ -8,6 +8,17 @@ const workerURL = "https://loral-worker.nima-hosseini.workers.dev/";
 
 const selectedProducts = [];
 
+// Save selected products to localStorage
+function saveSelectedProducts() {
+  localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts));
+}
+
+// Load selected products from localStorage
+function loadSelectedProducts() {
+  const savedProducts = localStorage.getItem("selectedProducts");
+  return savedProducts ? JSON.parse(savedProducts) : [];
+}
+
 function addProductToSelection(productId) {
   loadProducts().then((products) => {
     const product = products.find((p) => p.id == productId);
@@ -42,6 +53,9 @@ function addProductToSelection(productId) {
       if (productCard) {
         productCard.style.display = "none";
       }
+
+      // Save the updated selected products to localStorage
+      saveSelectedProducts();
     }
   });
 }
@@ -67,6 +81,9 @@ function removeProductFromSelection(productId) {
   if (productCard) {
     productCard.style.display = "flex";
   }
+
+  // Save the updated selected products to localStorage
+  saveSelectedProducts();
 }
 
 /* Show initial placeholder until user selects a category */
@@ -280,4 +297,41 @@ document.getElementById("generateRoutine").addEventListener("click", () => {
       ${routine.join("")}
     </div>
   `;
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Load saved products from localStorage
+  const savedProducts = loadSelectedProducts();
+
+  // Add saved products to the selectedProducts array
+  savedProducts.forEach((product) => {
+    selectedProducts.push(product);
+
+    // Update the selected products list
+    const selectedProductsList = document.getElementById("selectedProductsList");
+    selectedProductsList.innerHTML += `
+      <div class="selected-product" data-id="${product.id}">
+        <img src="${product.image}" alt="${product.name}">
+        <div>
+          <h4>${product.name}</h4>
+          <p>${product.brand}</p>
+        </div>
+        <button class="remove-product-btn">Remove</button>
+      </div>
+    `;
+
+    // Add event listener to the "Remove" button
+    const removeButton = selectedProductsList.querySelector(
+      `.selected-product[data-id="${product.id}"] .remove-product-btn`
+    );
+    removeButton.addEventListener("click", () => {
+      removeProductFromSelection(product.id);
+    });
+
+    // Hide the product from the product list
+    const productCard = document.querySelector(`.product-card[data-id="${product.id}"]`);
+    if (productCard) {
+      productCard.style.display = "none";
+    }
+  });
 });
