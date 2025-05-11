@@ -150,15 +150,15 @@ body {
 }
 
 .user-message {
-  background-color: #d1e7dd; /* Light green for user messages */
+  background-color: #FF003B; /* Light green for user messages */
   align-self: flex-end;
-  color: #0f5132;
+  color: #FFFFFF;
 }
 
 .bot-message {
-  background-color: #f8d7da; /* Light red for bot messages */
+  background-color: #E3A535; /* Light red for bot messages */
   align-self: flex-start;
-  color: #842029;
+  color: #FFFFFF;
 }
 
 /* visually hidden */
@@ -308,4 +308,22 @@ body {
 .routine-step p {
   font-size: 14px;
   color: #666;
+}
+
+/* Add Recommended Products button */
+.add-recommended-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-recommended-btn:hover {
+  background: #0056b3;
 }

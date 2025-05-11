@@ -115,11 +115,29 @@ chatForm.addEventListener("submit", async (e) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
-    const systemMessage = `
-      You are a helpful assistant. Only provide recommendations based on the following products:
-      ${selectedProducts.map((p) => `${p.name}: ${p.description}`).join("\n")}
-    `;
+    // Load all products from the JSON file
+    const allProducts = await loadProducts();
 
+    // Create a system message based on the selected products and all products
+    let systemMessage;
+    if (selectedProducts.length > 0) {
+      // If products are selected, include them in the system message
+      systemMessage = `
+        You are a helpful assistant. The user has selected the following products:
+        ${selectedProducts.map((p) => `${p.name}: ${p.description}`).join("\n")}
+
+        Additionally, you can recommend other products from the following list if they match the user's request:
+        ${allProducts.map((p) => `${p.name}: ${p.description}`).join("\n")}
+      `;
+    } else {
+      // If no products are selected, use all products
+      systemMessage = `
+        You are a helpful assistant. Recommend products based on the following list:
+        ${allProducts.map((p) => `${p.name}: ${p.description}`).join("\n")}
+      `;
+    }
+
+    // Make a request to the workerURL
     const response = await fetch(workerURL, {
       method: "POST",
       headers: {
@@ -139,12 +157,48 @@ chatForm.addEventListener("submit", async (e) => {
     // Remove the "Thinking..." message
     thinkingMessage.remove();
 
+    // Format the assistant's response with line breaks for readability
+    const botResponse = data.choices[0].message.content
+      .split("\n")
+      .map((line) => `<p>${line}</p>`)
+      .join("");
+
     // Display the assistant's response as a chat bubble
     chatWindow.innerHTML += `
       <div class="chat-message bot-message">
-        ${data.choices[0].message.content}
+        ${botResponse}
+        <button class="add-recommended-btn">Add Recommended Products</button>
       </div>
     `;
+
+    // Add event listener to the "Add Recommended Products" button
+    const addRecommendedBtn = document.querySelector(".add-recommended-btn");
+    addRecommendedBtn.addEventListener("click", () => {
+      // Extract product names from the response and add them to the selected products
+      const recommendedProducts = allProducts.filter((product) =>
+        botResponse.includes(product.name)
+      );
+
+      recommendedProducts.forEach((product) => {
+        if (!selectedProducts.some((p) => p.id === product.id)) {
+          selectedProducts.push(product);
+
+          // Update the selected products list
+          const selectedProductsList = document.getElementById("selectedProductsList");
+          selectedProductsList.innerHTML += `
+            <div class="selected-product">
+              <img src="${product.image}" alt="${product.name}">
+              <div>
+                <h4>${product.name}</h4>
+                <p>${product.brand}</p>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      alert("Recommended products have been added to your selection!");
+    });
 
     // Scroll to the bottom of the chat window
     chatWindow.scrollTop = chatWindow.scrollHeight;
